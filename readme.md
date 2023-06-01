@@ -1,5 +1,5 @@
 # About
-Easy-to-use command line interface app for tracking expenses and viewing summaries
+Easy-to-use command line interface app for tracking expenses and viewing summaries.
 
 # Capabilities
 1. Create new expenses file or open pre-exisiting file
@@ -11,3 +11,7 @@ Easy-to-use command line interface app for tracking expenses and viewing summari
 
 # Installation
 Download `main.py` and run it from the terminal.
+
+# File management
+- Expense files are saved as CSVs in the same folder as `main.py`.
+- Summaries are exported as CSVs in the same folder as `main.py`.
