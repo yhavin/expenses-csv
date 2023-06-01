@@ -11,7 +11,9 @@ Easy-to-use command line interface app for tracking expenses and viewing summari
 
 # Installation
 Install [tabulate](https://pypi.org/project/tabulate/) for table formatting.
-```pip install tabulate```
+```
+pip install tabulate
+```
 
 Download `main.py` and run it from the terminal.
 
