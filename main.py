@@ -120,7 +120,7 @@ def view_expenses(filename, is_deleting=False):
     headers = [word.title() for word in expenses[0]]
     rows = expenses[1:]
     for i in range(len(rows)):
-        rows[i][0] = i
+        rows[i][0] = i + 1
 
     total = [None, "TOTAL", None, None, sum([float(row[4]) for row in rows])]
     rows.append(total)
@@ -199,7 +199,7 @@ def delete_expense(filename):
         print("Invalid id. Please try again")
         return
     
-    del rows[choice + 1]
+    del rows[choice]
 
     with open(filename, "w", newline="") as file:
         writer = csv.writer(file)
