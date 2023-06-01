@@ -10,7 +10,9 @@ Easy-to-use command line interface app for tracking expenses and viewing summari
 6. Export summaries to CSV
 
 # Installation
-Run `pip install tabulate` to install [tabulate](https://pypi.org/project/tabulate/) for table formatting.
+Install [tabulate](https://pypi.org/project/tabulate/) for table formatting.
+```pip install tabulate```
+
 Download `main.py` and run it from the terminal.
 
 # File management
