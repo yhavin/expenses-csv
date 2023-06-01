@@ -29,7 +29,7 @@ def main_menu():
 
 # Create new expenses file
 def create_new_file(filename):
-    headers = ["date", "category", "description", "amount"]
+    headers = ["id", "date", "category", "description", "amount"]
 
     if not filename.endswith(".csv"):
         filename += ".csv"
@@ -56,10 +56,11 @@ def choose_operation(filename):
     print(f"Currently accessing file '{filename}'.")
     print("  1. Add new expense")
     print("  2. View all expenses")
-    print("  3. View category summary")
-    print("  4. View month summary")
-    print("  5. Back to main menu")
-    print("  6. Quit")
+    print("  3. Delete an expense")
+    print("  4. View category summary")
+    print("  5. View month summary")
+    print("  6. Back to main menu")
+    print("  7. Quit")
 
     choice = int(input("What would you like to do?\n"))
 
@@ -68,12 +69,14 @@ def choose_operation(filename):
     elif choice == 2:
         view_expenses(filename)
     elif choice == 3:
-        view_category_summary(filename)
+        view_expenses(filename, True)
     elif choice == 4:
-        view_month_summary(filename)
+        view_category_summary(filename)
     elif choice == 5:
-        main_menu()
+        view_month_summary(filename)
     elif choice == 6:
+        main_menu()
+    elif choice == 7:
         quit()
 
 
@@ -89,7 +92,10 @@ def add_expense(filename):
 
         date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
 
+        eid = datetime.now()
+
         expense = {
+            eid: eid,
             date: date,
             category: category,
             description: description,
@@ -104,19 +110,25 @@ def add_expense(filename):
 
 
 # View expenses
-def view_expenses(filename):
+def view_expenses(filename, is_deleting=False):
     with open(filename, "r", newline="") as file:
         reader = csv.reader(file)
         expenses = list(reader)
 
     headers = [word.title() for word in expenses[0]]
     rows = expenses[1:]
+    for i in range(len(rows)):
+        rows[i][0] = i
 
-    total = [None, "TOTAL", None, sum([float(row[3]) for row in rows])]
+    total = [None, "TOTAL", None, None, sum([float(row[4]) for row in rows])]
     rows.append(total)
 
     table = tabulate(rows, headers=headers, tablefmt="grid", floatfmt=".2f")
     print(table, "\n")
+    
+    if is_deleting:
+        delete_expense(filename)
+    
     sleep(2)
     choose_operation(filename)
 
@@ -172,6 +184,29 @@ def view_month_summary(filename):
     table = tabulate(summary_list, headers=headers, tablefmt="grid", floatfmt=".2f")
     print(table, "\n")
     export_menu("month", headers, summary_list, filename)
+
+
+# Delete expense menu
+def delete_expense(filename):
+    choice = int(input("Enter the id of the expense to remove: "))
+
+    with open(filename, "r", newline="") as file:
+        rows = list(csv.reader(file))
+
+    if choice < 0 or choice > (len(rows) - 2):
+        print("Invalid id. Please try again")
+        return
+    
+    del rows[choice + 1]
+
+    with open(filename, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerows(rows)
+
+    print(f"Expense id {choice} deleted.")
+
+    sleep(2)
+    choose_operation(filename)
 
 
 # Export summary menu
