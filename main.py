@@ -6,6 +6,7 @@ import csv
 from tabulate import tabulate
 from time import sleep
 from datetime import datetime
+import time
 
 
 # Prompt user to choose existing file or create new
@@ -92,7 +93,7 @@ def add_expense(filename):
 
         date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
 
-        eid = datetime.now()
+        eid = time.time()
 
         expense = {
             eid: eid,
@@ -141,8 +142,8 @@ def view_category_summary(filename):
 
     category_totals = {}
     for expense in expenses[1:]:
-        category = expense[1]
-        amount = float(expense[3])
+        category = expense[2]
+        amount = float(expense[4])
 
         if category in category_totals:
             category_totals[category] += amount
@@ -167,9 +168,9 @@ def view_month_summary(filename):
 
     month_totals = {}
     for expense in expenses[1:]:
-        date = datetime.strptime(expense[0], "%Y-%m-%d")
+        date = datetime.strptime(expense[1], "%Y-%m-%d")
         month_year = date.strftime("%B-%Y")
-        amount = float(expense[3])
+        amount = float(expense[4])
 
         if month_year in month_totals:
             month_totals[month_year] += amount
