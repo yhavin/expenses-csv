@@ -5,6 +5,7 @@
 import csv
 from tabulate import tabulate
 from time import sleep
+from datetime import datetime
 
 
 # Prompt user to choose existing file or create new
@@ -55,9 +56,10 @@ def choose_operation(filename):
     print(f"Currently accessing file '{filename}'.")
     print("  1. Add new expense")
     print("  2. View all expenses")
-    print("  3. View summary")
-    print("  4. Back to main menu")
-    print("  5. Quit")
+    print("  3. View category summary")
+    print("  4. View month summary")
+    print("  5. Back to main menu")
+    print("  6. Quit")
 
     choice = int(input("What would you like to do? "))
 
@@ -66,10 +68,12 @@ def choose_operation(filename):
     elif choice == 2:
         view_expenses(filename)
     elif choice == 3:
-        view_summary(filename)
+        view_category_summary(filename)
     elif choice == 4:
-        main_menu()
+        view_month_summary(filename)
     elif choice == 5:
+        main_menu()
+    elif choice == 6:
         quit()
 
 
@@ -106,14 +110,17 @@ def view_expenses(filename):
     headers = [word.title() for word in expenses[0]]
     rows = expenses[1:]
 
+    total = [None, "TOTAL", None, sum([float(row[3]) for row in rows])]
+    rows.append(total)
+
     table = tabulate(rows, headers=headers, tablefmt="grid", floatfmt=".2f")
     print(table, "\n")
     sleep(2)
     choose_operation(filename)
 
 
-# View summary
-def view_summary(filename):
+# View category summary
+def view_category_summary(filename):
     with open(filename, "r", newline="") as file:
         reader = csv.reader(file)
         expenses = list(reader)
@@ -129,11 +136,42 @@ def view_summary(filename):
             category_totals[category] = amount
     
     summary_list = [[category, total_spent] for category, total_spent in category_totals.items()]
+    total = ["TOTAL", sum([float(row[1]) for row in summary_list])]
+    summary_list.append(total)
+
     headers = ["Category", "Total spent"]
     table = tabulate(summary_list, headers=headers, tablefmt="grid", floatfmt=".2f")
     print(table, "\n")
     sleep(2)
     choose_operation(filename)
+
+
+# View month summary
+def view_month_summary(filename):
+    with open(filename, "r", newline="") as file:
+        reader = csv.reader(file)
+        expenses = list(reader)
+
+    month_totals = {}
+    for expense in expenses[1:]:
+        date = datetime.strptime(expense[0], "%Y-%m-%d")
+        month_year = date.strftime("%B-%Y")
+        amount = float(expense[3])
+
+        if month_year in month_totals:
+            month_totals[month_year] += amount
+        else:
+            month_totals[month_year] = amount   
+
+    summary_list = [[month_year, total_spent] for month_year, total_spent in month_totals.items()]
+    total = ["TOTAL", sum([float(row[1]) for row in summary_list])]
+    summary_list.append(total)
+    
+    headers = ["Month-Year", "Total spent"]
+    table = tabulate(summary_list, headers=headers, tablefmt="grid", floatfmt=".2f")
+    print(table, "\n")
+    sleep(2)
+    choose_operation(filename) 
 
 
 # Driver code
