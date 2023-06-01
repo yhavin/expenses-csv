@@ -15,7 +15,7 @@ def main_menu():
     print("  2. Continue from saved file")
     print("  3. Quit")
 
-    choice = int(input("What would you like to do? "))
+    choice = int(input("What would you like to do?\n"))
 
     if choice == 1:
         filename = input("Name your new expenses file: ")
@@ -39,7 +39,7 @@ def create_new_file(filename):
         print(headers)
         writer.writerow(headers)
 
-    print(f"New expenses file '{filename}' created.")
+    print(f"New expenses file '{filename}' created.\n")
     choose_operation(filename)
 
 
@@ -61,7 +61,7 @@ def choose_operation(filename):
     print("  5. Back to main menu")
     print("  6. Quit")
 
-    choice = int(input("What would you like to do? "))
+    choice = int(input("What would you like to do?\n"))
 
     if choice == 1:
         add_expense(filename)
@@ -86,6 +86,8 @@ def add_expense(filename):
         category = input("Enter the category: ").capitalize()
         description = input("Enter the description: ").capitalize()
         amount = float(input("Enter the amount: "))
+
+        date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
 
         expense = {
             date: date,
@@ -142,8 +144,7 @@ def view_category_summary(filename):
     headers = ["Category", "Total spent"]
     table = tabulate(summary_list, headers=headers, tablefmt="grid", floatfmt=".2f")
     print(table, "\n")
-    sleep(2)
-    choose_operation(filename)
+    export_menu("category", headers, summary_list, filename)
 
 
 # View month summary
@@ -166,12 +167,30 @@ def view_month_summary(filename):
     summary_list = [[month_year, total_spent] for month_year, total_spent in month_totals.items()]
     total = ["TOTAL", sum([float(row[1]) for row in summary_list])]
     summary_list.append(total)
-    
+
     headers = ["Month-Year", "Total spent"]
     table = tabulate(summary_list, headers=headers, tablefmt="grid", floatfmt=".2f")
     print(table, "\n")
+    export_menu("month", headers, summary_list, filename)
+
+
+# Export summary menu
+def export_menu(type, headers, data, filename):
     sleep(2)
-    choose_operation(filename) 
+    choice = input("Would you like to export this summary? (y/N)\n")
+
+    if choice == "y":
+        date_tag = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        export_name = type + "_summary_" + date_tag + ".csv"
+        with open(export_name, "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(headers)
+            for row in data:
+                writer.writerow([row[0], f"{row[1]:.2f}"])
+        
+        print(f"Exported to {export_name}.")
+        sleep(1)
+    choose_operation(filename)
 
 
 # Driver code
